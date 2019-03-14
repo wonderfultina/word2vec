@@ -85,3 +85,7 @@ word2vec对这个模型做了改进，首先，对于从输入层到隐藏层的
 要得到模型中w词向量和内部节点的模型参数θ, 我们使用梯度上升法即可。首先我们求模型参数θwj−1的梯度：
 
 ![4](https://github.com/wonderfultina/word2vec/blob/master/images/8.png)
+
+同样的方法，可以求出xw的梯度表达式如下：
+
+![4](https://github.com/wonderfultina/word2vec/blob/master/images/9.png)
