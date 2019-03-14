@@ -79,9 +79,9 @@ word2vec对这个模型做了改进，首先，对于从输入层到隐藏层的
 
 在word2vec中，由于使用的是随机梯度上升法，所以并没有把所有样本的似然乘起来得到真正的训练集最大似然，仅仅每次只用一个样本更新梯度，这样做的目的是减少梯度计算量。这样我们可以得到w的对数似然函数L如下：
 
-![4](https://github.com/wonderfultina/word2vec/blob/master/images/6BAB.tmp.png)
+![4](https://github.com/wonderfultina/word2vec/blob/master/images/7.png)
 
 
 要得到模型中w词向量和内部节点的模型参数θ, 我们使用梯度上升法即可。首先我们求模型参数θwj−1的梯度：
 
-![4](https://github.com/wonderfultina/word2vec/blob/master/images/6BAB.tmp.png)
+![4](https://github.com/wonderfultina/word2vec/blob/master/images/8.png)
