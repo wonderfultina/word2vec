@@ -89,3 +89,28 @@ word2vec对这个模型做了改进，首先，对于从输入层到隐藏层的
 同样的方法，可以求出xw的梯度表达式如下：
 
 ![4](https://github.com/wonderfultina/word2vec/blob/master/images/9.png)
+
+
+5. 基于Hierarchical Softmax的CBOW模型
+
+首先我们要定义词向量的维度大小M，以及CBOW的上下文大小2c,这样我们对于训练样本中的每一个词，其前面的c个词和后面的c个词作为了CBOW模型的输入,该词本身作为样本的输出，期望softmax概率最大。
+在做CBOW模型前，我们需要先将词汇表建立成一颗霍夫曼树。
+对于从输入层到隐藏层（投影层），这一步比较简单，就是对w周围的2c个词向量求和取平均即可，即：
+
+![4](https://github.com/wonderfultina/word2vec/blob/master/images/10.png)
+
+第二步，通过梯度上升法来更新我们的θwj−1和xw，注意这里的xw是由2c个词向量相加而成，我们做梯度更新完毕后会用梯度项直接更新原始的各个xi(i=1,2,,,,2c)，即：
+
+![4](https://github.com/wonderfultina/word2vec/blob/master/images/11.png)
+
+
+其中η为梯度上升法的步长。
+这里总结下基于Hierarchical Softmax的CBOW模型算法流程，梯度迭代使用了随机梯度上升法：
+输入：基于CBOW的语料训练样本，词向量的维度大小M，CBOW的上下文大小2c,步长η
+输出：霍夫曼树的内部节点模型参数θ，所有的词向量w
+1. 基于语料训练样本建立霍夫曼树。
+2. 随机初始化所有的模型参数θ，所有的词向量w
+3. 进行梯度上升迭代过程，对于训练集中的每一个样本(context(w),w)做如下处理：
+
+![4](https://github.com/wonderfultina/word2vec/blob/master/images/12.png)
+
