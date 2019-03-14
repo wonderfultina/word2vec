@@ -114,3 +114,25 @@ word2vec对这个模型做了改进，首先，对于从输入层到隐藏层的
 
 ![4](https://github.com/wonderfultina/word2vec/blob/master/images/12.png)
 
+6. 基于Hierarchical Softmax的Skip-Gram模型
+
+现在我们先看看基于Skip-Gram模型时， Hierarchical Softmax如何使用。此时输入的只有一个词w,输出的为2c个词向量context(w)。
+我们对于训练样本中的每一个词，该词本身作为样本的输入， 其前面的c个词和后面的c个词作为了Skip-Gram模型的输出,，期望这些词的softmax概率比其他的词大。　Skip-Gram模型和CBOW模型其实是反过来的，在上一篇已经讲过。
+在做CBOW模型前，我们需要先将词汇表建立成一颗霍夫曼树。
+对于从输入层到隐藏层（投影层），这一步比CBOW简单，由于只有一个词，所以，即xw就是词w对应的词向量。
+第二步，通过梯度上升法来更新我们的θwj−1和xw，注意这里的xw周围有2c个词向量，此时如果我们期望P(xi|xw),i=1,2...2c最大。此时我们注意到由于上下文是相互的，在期望P(xi|xw),i=1,2...2c最大化的同时，反过来我们也期望P(xw|xi),i=1,2...2c最大。那么是使用P(xi|xw)好还是P(xw|xi)好呢，word2vec使用了后者，这样做的好处就是在一个迭代窗口内，我们不是只更新xw一个词，而是xi,i=1,2...2c共2c个词。这样整体的迭代会更加的均衡。因为这个原因，Skip-Gram模型并没有和CBOW模型一样对输入进行迭代更新，而是对2c个输出进行迭代更新。
+这里总结下基于Hierarchical Softmax的Skip-Gram模型算法流程，梯度迭代使用了随机梯度上升法：
+输入：基于Skip-Gram的语料训练样本，词向量的维度大小M，Skip-Gram的上下文大小2c,步长η
+输出：霍夫曼树的内部节点模型参数θ，所有的词向量w
+1. 基于语料训练样本建立霍夫曼树。
+2. 随机初始化所有的模型参数θ，所有的词向量w,
+3. 进行梯度上升迭代过程，对于训练集中的每一个样本(w,context(w))做如下处理：
+  a)  for i =1 to 2c:
+    i) e=0
+    ii)for j = 2 to lw, 计算：
+        f=σ(xTiθwj−1)
+        g=(1−dwj−f)η
+        e=e+gθwj−1
+        θwj−1=θwj−1+gxi
+　　iii) xi=xi+e
+　 b)如果梯度收敛，则结束梯度迭代，算法结束，否则回到步骤a继续迭代。
