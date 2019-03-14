@@ -66,4 +66,22 @@ word2vec对这个模型做了改进，首先，对于从输入层到隐藏层的
 
 ![4](https://github.com/wonderfultina/word2vec/blob/master/images/6BAB.tmp.png)
 
+对于所有的训练样本，我们期望最大化所有样本的似然函数乘积。
+为了便于我们后面一般化的描述，我们定义输入的词为w,其从输入层词向量求和平均后的霍夫曼树根节点词向量为xw, 从根节点到w所在的叶子节点，包含的节点总数为lw, w在霍夫曼树中从根节点开始，经过的第i个节点表示为pwi,对应的霍夫曼编码为dwi∈{0,1},其中i=2,3,...lw。而该节点对应的模型参数表示为θwi, 其中i=1,2,...lw−1，没有i=lw是因为模型参数仅仅针对于霍夫曼树的内部节点。
 
+定义w经过的霍夫曼树某一个节点j的逻辑回归概率为P(dwj|xw,θwj−1)，其表达式为：
+
+![4](https://github.com/wonderfultina/word2vec/blob/master/images/5.png)
+
+那么对于某一个目标输出词w,其最大似然为：
+
+![4](https://github.com/wonderfultina/word2vec/blob/master/images/6.png)
+
+在word2vec中，由于使用的是随机梯度上升法，所以并没有把所有样本的似然乘起来得到真正的训练集最大似然，仅仅每次只用一个样本更新梯度，这样做的目的是减少梯度计算量。这样我们可以得到w的对数似然函数L如下：
+
+![4](https://github.com/wonderfultina/word2vec/blob/master/images/6BAB.tmp.png)
+
+
+要得到模型中w词向量和内部节点的模型参数θ, 我们使用梯度上升法即可。首先我们求模型参数θwj−1的梯度：
+
+![4](https://github.com/wonderfultina/word2vec/blob/master/images/6BAB.tmp.png)
