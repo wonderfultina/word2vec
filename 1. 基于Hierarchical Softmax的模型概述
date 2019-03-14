@@ -16,7 +16,7 @@ word2vec也使用了CBOW与Skip-Gram来训练模型与得到词向量，但是�
 首先是最小的b和f合并，得到的新树根节点权重是7.此时森林里5棵树，根节点权重分别是20,8,6,16,7。此时根节点权重最小的6,7合并，得到新子树，
 依次类推，最终得到下面的霍夫曼树。
 
-![image](https://github.com/wonderfultina/word2vec/blob/master/images/51C6.tmp.jpg)
+![1](https://github.com/wonderfultina/word2vec/blob/master/images/51C6.tmp.jpg)
 
 
 
@@ -29,7 +29,8 @@ word2vec也使用了CBOW与Skip-Gram来训练模型与得到词向量，但是�
 传统的神经网络词向量语言模型，里面一般有三层，输入层（词向量），隐藏层和输出层（softmax层）。里面最大的问题在于从隐藏层到输出的softmax层的计算量很大，因为要计算所有词的softmax概率，再去找概率最大的值。
 这个模型如下图所示。其中V是词汇表的大小。
 
-![image](https://github.com/wonderfultina/word2vec/blob/master/images/59D9.tmp.png)
+![1](https://github.com/wonderfultina/word2vec/blob/master/images/59D9.tmp.png)
+
 
 word2vec对这个模型做了改进，首先，对于从输入层到隐藏层的映射，没有采取神经网络的线性变换加激活函数的方法，而是采用简单的对所有输入词向量求和并取平均的方法。
 比如输入的是三个4维词向量：(1,2,3,4),(9,6,11,8),(5,10,7,12),那么我们word2vec映射后的词向量就是(5,6,7,8)。由于这里是从多个词向量变成了一个词向量。
@@ -45,5 +46,20 @@ word2vec对这个模型做了改进，首先，对于从输入层到隐藏层的
 如何“沿着霍夫曼树一步步完成”呢？
 在word2vec中，我们采用了二元逻辑回归的方法，即规定沿着左子树走，那么就是负类(霍夫曼树编码1)，沿着右子树走，那么就是正类(霍夫曼树编码0)。判别正类和负类的方法是使用sigmoid函数，即：
 
-![image](https://github.com/wonderfultina/word2vec/blob/master/images/62E7.tmp.png)
+![1](https://github.com/wonderfultina/word2vec/blob/master/images/62E7.tmp.png)
+
+
+其中xw是当前内部节点的词向量，而θ则是我们需要从训练样本求出的逻辑回归的模型参数。
+使用霍夫曼树有什么好处呢？首先，由于是二叉树，之前计算量为V,现在变成了log2V。
+第二，由于使用霍夫曼树是高频的词靠近树根，这样高频词需要更少的时间会被找到，这符合我们的贪心优化思想。
+容易理解，被划分为左子树而成为负类的概率为P(−)=1−P(+)。在某一个内部节点，要判断是沿左子树还是右子树走的标准就是看P(−),P(+)谁的概率值大。
+而控制P(−),P(+)谁的概率值大的因素一个是当前节点的词向量，另一个是当前节点的模型参数θ。
+对于上图中的w2，如果它是一个训练样本的输出，那么我们期望对于里面的隐藏节点n(w2,1)的P(−)概率大，n(w2,2)的P(−)概率大，n(w2,3)的P(+)概率大。
+回到基于Hierarchical Softmax的word2vec本身，我们的目标就是找到合适的所有节点的词向量和所有内部节点θ, 使训练样本达到最大似然。那么如何达到最大似然呢？
+
+
+4. 基于Hierarchical Softmax的模型梯度计算
+
+我们使用最大似然法来寻找所有节点的词向量和所有内部节点θ。先拿上面的w2例子来看，我们期望最大化下面的似然函数：
+
 
